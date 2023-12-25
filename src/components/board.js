@@ -17,13 +17,14 @@ export default function Board() {
             try {
                 const response = await fetch(`https://codeforces.com/api/user.info?handles=${handles}`);
                 const data = await response.json();
-                setUserData(data);
+
                 const filteredData = data.result.filter(entry => {
                     const usr = findUserDetails(entry.handle);
                     const regNoPrefix = usr.regNo.substring(0, 4);
                     return selectedYear === 'ALL' || regNoPrefix === selectedYear;
                 });
-                setUserData(filteredData);
+                data.result = filteredData;
+                setUserData(data);
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -57,7 +58,7 @@ export default function Board() {
                 </select>
             </div>
 
-            <Profiles Leaderboard={arrange(userData, sortingCriteria)}></Profiles>
+            <Profiles Leaderboard={arrange(userData.result, sortingCriteria)}></Profiles>
         </div>
     );
 }
