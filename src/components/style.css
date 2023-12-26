@@ -25,29 +25,12 @@
     margin-bottom: 1em;
 }
 
-.board .duration {
+/* .board .duration {
     display: flex;
     justify-content: center;
     gap: 1em;
-}
+} */
 
-.board .duration>button {
-    border: 1px solid var(--color-light);
-    padding: .5em 2em;
-    border-radius: 50px;
-    background-color: transparent;
-    cursor: pointer;
-}
-
-.board .duration>button:hover {
-    background-color: var(--color-dark);
-    color: var(--color-light);
-}
-
-.active {
-    background-color: var(--color-dark);
-    color: var(--color-light);
-}
 
 #profile {
     /* display: flex; */
@@ -61,12 +44,17 @@
     gap: 1em;
     text-align: left;
     margin-bottom: 2em;
+    flex-wrap: wrap
 }
 
 #profile .flex .item {
     display: flex;
+    width: 10%;
     align-items: center;
+    flex-basis: auto;
+    padding: 1%;
 }
+
 
 #profile .flex img {
     width: 20%;
@@ -91,5 +79,4 @@
 
 .bronze {
     background-color: #cd7f32;
-    /* Bronze color */
 }

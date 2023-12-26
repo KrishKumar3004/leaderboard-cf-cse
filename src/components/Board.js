@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Profiles from './profiles';
-import { database } from './database';
+import Profiles from './Profiles';
+import { database } from './Database';
+
 
 export default function Board() {
     const [userData, setUserData] = useState({});
@@ -59,6 +60,7 @@ export default function Board() {
             </div>
 
             <Profiles Leaderboard={arrange(userData.result, sortingCriteria)}></Profiles>
+
         </div>
     );
 }
