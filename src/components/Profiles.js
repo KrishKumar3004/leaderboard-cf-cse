@@ -1,23 +1,37 @@
 import React from 'react';
 import { database } from './Database';
 
+const rankColorMap = {
+    newbie: 'gray',
+    pupil: 'green',
+    specialist: 'cyan',
+    expert: 'blue',
+    candidateMaster: 'purple',
+    master: 'yellow',
+    internationalMaster: 'red',
+};
+
 export default function Profiles({ Leaderboard }) {
     return (
-        <div id="profile">
+        <div id="profile" className="table-container">
             <table className="table">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Handle</th>
+                        <th scope="col" className="hide-on-mobile">
+                            Handle
+                        </th>
                         <th scope="col">Name</th>
-                        <th scope="col">Registration No.</th>
+                        <th scope="col" className="hide-on-mobile">
+                            Registration No.
+                        </th>
                         <th scope="col">Rating</th>
-                        <th scope="col">Max Rating</th>
+                        <th scope="col" >
+                            Max
+                        </th>
                     </tr>
                 </thead>
-                <tbody>
-                    {Item(Leaderboard)}
-                </tbody>
+                <tbody>{Item(Leaderboard)}</tbody>
             </table>
         </div>
     );
@@ -34,23 +48,22 @@ function Item(data) {
             {data.map((value, index) => {
                 const userdetails = findUserDetails(value.handle);
 
-                let rankColorClass = '';
-                if (index === 0) {
-                    rankColorClass = 'gold';
-                } else if (index === 1) {
-                    rankColorClass = 'silver';
-                } else if (index === 2) {
-                    rankColorClass = 'bronze';
-                }
+                const rankColor = rankColorMap[value.rank] || '';
+
+                const tdStyle = {
+                    color: rankColor,
+                };
 
                 return (
-                    <tr key={index} className={rankColorClass}>
+                    <tr key={index}>
                         <th scope="row">{index + 1}</th>
-                        <td>{value.handle}</td>
+                        <td className="hide-on-mobile" style={tdStyle}>
+                            {value.handle}
+                        </td>
                         <td>{userdetails.name}</td>
-                        <td>{userdetails.regNo}</td>
+                        <td className="hide-on-mobile">{userdetails.regNo}</td>
                         <td>{value.rating}</td>
-                        <td>{value.maxRating}</td>
+                        <td >{value.maxRating}</td>
                     </tr>
                 );
             })}

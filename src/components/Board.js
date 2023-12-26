@@ -43,15 +43,15 @@ export default function Board() {
 
     return (
         <div className="board">
-            <h1 className='leaderboard'>Leaderboard</h1>
 
-            <div className="duration">
+
+            <div className="select-container">
                 <select name="sort" id="sort" onChange={handleSortingChange} value={sortingCriteria}>
                     <option value="curr-rating">Current Rating</option>
                     <option value="max-rating">Max Rating</option>
                 </select>
 
-                <select name="year" id="year" onChange={handleYearChange} value={selectedYear} >
+                <select name="year" id="year" onChange={handleYearChange} value={selectedYear}>
                     <option value="ALL">All</option>
                     <option value="2021">2021</option>
                     <option value="2022">2022</option>
@@ -61,7 +61,7 @@ export default function Board() {
 
             <Profiles Leaderboard={arrange(userData.result, sortingCriteria)}></Profiles>
 
-        </div>
+        </div >
     );
 }
 
