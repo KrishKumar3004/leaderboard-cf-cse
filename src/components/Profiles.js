@@ -1,5 +1,4 @@
 import React from 'react';
-import { database } from './Database';
 
 const rankColorMap = {
     newbie: 'gray',
@@ -11,7 +10,7 @@ const rankColorMap = {
     internationalMaster: 'red',
 };
 
-export default function Profiles({ Leaderboard }) {
+const Profiles = ({ usersData }) => {
     return (
         <div id="profile" className="table-container">
             <table className="table table-transparent">
@@ -26,47 +25,43 @@ export default function Profiles({ Leaderboard }) {
                             Registration No.
                         </th>
                         <th scope="col">Rating</th>
-                        <th scope="col" >
+                        <th scope="col">
                             Max
                         </th>
                     </tr>
                 </thead>
-                <tbody>{Item(Leaderboard)}</tbody>
+                <tbody>{Item(usersData)}</tbody>
             </table>
         </div>
     );
-}
+};
 
-function findUserDetails(handle) {
-    const user = database.find((user) => user.codeforcesHandle === handle);
-    return user ? { name: user.name, regNo: user.regNo } : { name: '', regNo: '' };
-}
+const Item = (data) => (
+    <>
+        {data.map((value, index) => {
 
-function Item(data) {
-    return (
-        <>
-            {data.map((value, index) => {
-                const userdetails = findUserDetails(value.handle);
+            const rankColor = rankColorMap[value.rank] || '';
 
-                const rankColor = rankColorMap[value.rank] || '';
+            const tdStyle = {
+                color: rankColor,
+            };
 
-                const tdStyle = {
-                    color: rankColor,
-                };
+            return (
+                <tr key={index}>
+                    <th scope="row">{index + 1}</th>
+                    <td className="hide-on-mobile" style={tdStyle}>
+                        {value.handle}
+                    </td>
+                    {/* <a href='https://codeforces.com/profile/mhtkrag'> */}
+                    <td>{value.name}</td>
+                    {/* </a> */}
+                    <td className="hide-on-mobile">{value.regno}</td>
+                    <td>{value.rating}</td>
+                    <td>{value.maxRating}</td>
+                </tr>
+            );
+        })}
+    </>
+);
 
-                return (
-                    <tr key={index}>
-                        <th scope="row">{index + 1}</th>
-                        <td className="hide-on-mobile" style={tdStyle}>
-                            {value.handle}
-                        </td>
-                        <td>{userdetails.name}</td>
-                        <td className="hide-on-mobile">{userdetails.regNo}</td>
-                        <td>{value.rating}</td>
-                        <td >{value.maxRating}</td>
-                    </tr>
-                );
-            })}
-        </>
-    );
-}
+export default Profiles;

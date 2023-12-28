@@ -1,71 +1,85 @@
 import React, { useState, useEffect } from 'react';
 import Profiles from './Profiles';
-import { database } from './Database';
 
-
-export default function Board() {
-    const [userData, setUserData] = useState({});
-    const [sortingCriteria, setSortingCriteria] = useState('curr-rating');
+const Board = () => {
+    const [usersData, setUsersData] = useState([]);
+    const [instituteData, setInstituteData] = useState([]);
+    const [sortingCriteria, setSortingCriteria] = useState('max-rating');
     const [selectedYear, setSelectedYear] = useState('ALL');
 
-    const handles = 'KrishKrosh;mhtkrag;shivansh_232;NotShivam_382;Yash_968;tarun_k456;console.shivam';
-    function findUserDetails(handle) {
-        const user = database.find((user) => user.codeforcesHandle === handle);
-        return user ? { name: user.name, regNo: user.regNo } : { name: '', regNo: '' };
-    }
     useEffect(() => {
-        const fetchNData = async () => {
+        const fetchInstituteData = async () => {
             try {
                 const apiUrl = 'https://pcon-leaderboard-backend.vercel.app/api/getCfHandles';
                 const response = await fetch(apiUrl);
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
-                    //setCfHandles(data);
+                    setInstituteData(data);
+                    return data;
                 } else {
                     console.error('Failed to fetch data');
+                    return [];
                 }
-
-                //setLoading(false);
             } catch (error) {
                 console.error('Error during API call:', error);
-                //setLoading(false);
+                return [];
             }
         };
 
-        fetchNData();
-        const fetchData = async () => {
+        const fetchCodeforcesData = async () => {
             try {
+                const res = await fetchInstituteData();
+                const handles = res.map(user => user.cf_handle).join(';');
+
                 const response = await fetch(`https://codeforces.com/api/user.info?handles=${handles}`);
                 const data = await response.json();
 
-                const filteredData = data.result.filter(entry => {
-                    const usr = findUserDetails(entry.handle);
-                    const regNoPrefix = usr.regNo.substring(0, 4);
-                    return selectedYear === 'ALL' || regNoPrefix === selectedYear;
-                });
-                data.result = filteredData;
-                setUserData(data);
+                if (data.status === 'OK') {
+                    const mergedData = data.result.map(entry => {
+                        const matchingResEntry = res.find(resEntry => resEntry.cf_handle === entry.handle);
+                        if (matchingResEntry) {
+                            return { ...entry, ...matchingResEntry };
+                        }
+                        return entry;
+                    });
+                    setUsersData(mergedData);
+
+                } else {
+                    console.error('Error fetching user data:', data.comment || 'Unknown error');
+                }
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
         };
-
-        fetchData();
-    }, [selectedYear]);
+        fetchCodeforcesData();
+    }, [instituteData]);
 
     const handleSortingChange = (e) => {
         setSortingCriteria(e.target.value);
     };
+
     const handleYearChange = (e) => {
         setSelectedYear(e.target.value);
     };
 
+    const filterAndSort = (data) => {
+        const filteredData = data.filter((user => selectedYear === 'ALL' || selectedYear == user.batch));
+        return filteredData
+            ? filteredData
+                .sort((a, b) => {
+                    if (sortingCriteria === 'curr-rating') {
+                        return b.rating - a.rating;
+                    } else if (sortingCriteria === 'max-rating') {
+                        return b.maxRating - a.maxRating;
+                    }
+                    return 0;
+                })
+            : [];
+    };
+
     return (
         <div className="board">
-
-
             <div className="select-container">
                 <select name="sort" id="sort" onChange={handleSortingChange} value={sortingCriteria}>
                     <option value="curr-rating">Current Rating</option>
@@ -80,20 +94,9 @@ export default function Board() {
                 </select>
             </div>
 
-            <Profiles Leaderboard={arrange(userData.result, sortingCriteria)}></Profiles>
-
-        </div >
+            <Profiles usersData={filterAndSort(usersData)}></Profiles>
+        </div>
     );
-}
+};
 
-function arrange(data, sortingCriteria) {
-    return data ? data.sort((a, b) => {
-        if (sortingCriteria === 'curr-rating') {
-            return b.rating - a.rating;
-        } else if (sortingCriteria === 'max-rating') {
-            return b.maxRating - a.maxRating;
-        }
-        return 0;
-    }) : [];
-}
-
+export default Board;

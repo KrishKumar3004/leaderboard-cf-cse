@@ -1,14 +1,10 @@
 body {
     margin: 0;
     padding: 0;
-    background-image: url('/home/krish/Projects/go-grind/public/binary-matrix.jpeg');
-    /* Make sure to use the correct path */
     background-size: cover;
-    /* or "contain" based on your preference */
     background-position: center center;
     background-repeat: no-repeat;
     height: 100vh;
-    /* Optional: Set the height to cover the entire viewport */
 }
 
 .table-container {
@@ -56,6 +52,7 @@ select:focus {
     }
 }
 
+
 /* RegisterModal.css */
 
 .modal {
@@ -70,7 +67,6 @@ select:focus {
 
 .modal-content {
     background-color: rgba(255, 255, 255, 0.8);
-    /* Updated to include transparency */
     margin: 10% auto;
     padding: 20px;
     width: 60%;
@@ -105,7 +101,6 @@ button {
     cursor: pointer;
 }
 
-/* Updated styles to overlay the content */
 .show {
     display: block;
 }
