@@ -1,11 +1,13 @@
 body {
     margin: 0;
     padding: 0;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
     height: 100vh;
+    background-image: url('/home/krish/Projects/go-grind/public/black-bg.jpeg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
+
 
 .table-container {
     max-width: 80%;
@@ -94,12 +96,7 @@ input {
     padding: 8px;
 }
 
-button {
-    background-color: #4caf50;
-    color: #fff;
-    padding: 10px;
-    cursor: pointer;
-}
+
 
 .show {
     display: block;
@@ -119,4 +116,9 @@ button {
 .table-transparent td {
     background-color: rgba(255, 255, 255, 0.4) !important;
 
+}
+
+
+.navbar {
+    background-color: rgba(255, 255, 255, 0.7) !important;
 }
