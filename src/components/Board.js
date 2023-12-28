@@ -14,6 +14,27 @@ export default function Board() {
         return user ? { name: user.name, regNo: user.regNo } : { name: '', regNo: '' };
     }
     useEffect(() => {
+        const fetchNData = async () => {
+            try {
+                const apiUrl = 'https://pcon-leaderboard-backend.vercel.app/api/getCfHandles';
+                const response = await fetch(apiUrl);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    //setCfHandles(data);
+                } else {
+                    console.error('Failed to fetch data');
+                }
+
+                //setLoading(false);
+            } catch (error) {
+                console.error('Error during API call:', error);
+                //setLoading(false);
+            }
+        };
+
+        fetchNData();
         const fetchData = async () => {
             try {
                 const response = await fetch(`https://codeforces.com/api/user.info?handles=${handles}`);

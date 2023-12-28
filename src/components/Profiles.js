@@ -14,7 +14,7 @@ const rankColorMap = {
 export default function Profiles({ Leaderboard }) {
     return (
         <div id="profile" className="table-container">
-            <table className="table">
+            <table className="table table-transparent">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
