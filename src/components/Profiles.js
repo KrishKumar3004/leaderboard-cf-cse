@@ -6,7 +6,7 @@ const Profiles = ({ usersData }) => {
             <table className="table table-transparent">
                 <thead>
                     <tr>
-                        <th scope="col">Rank</th>
+                        <th scope="col">#</th>
                         <th scope="col" className="hide-on-mobile">
                             Handle
                         </th>
