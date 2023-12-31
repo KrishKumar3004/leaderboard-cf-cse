@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Profiles from './Profiles';
+import { InfinitySpin } from 'react-loader-spinner'
+
 
 const Board = () => {
     const [usersData, setUsersData] = useState([]);
-    const [instituteData, setInstituteData] = useState([]);
     const [sortingCriteria, setSortingCriteria] = useState('max-rating');
     const [selectedYear, setSelectedYear] = useState('ALL');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchInstituteData = async () => {
@@ -15,7 +17,6 @@ const Board = () => {
 
                 if (response.ok) {
                     const data = await response.json();
-                    setInstituteData(data);
                     return data;
                 } else {
                     console.error('Failed to fetch data');
@@ -44,16 +45,18 @@ const Board = () => {
                         return entry;
                     });
                     setUsersData(mergedData);
-
                 } else {
                     console.error('Error fetching user data:', data.comment || 'Unknown error');
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
+            } finally {
+                setLoading(false);
             }
         };
+
         fetchCodeforcesData();
-    }, [instituteData]);
+    }, []);
 
     const handleSortingChange = (e) => {
         setSortingCriteria(e.target.value);
@@ -94,7 +97,19 @@ const Board = () => {
                 </select>
             </div>
 
-            <Profiles usersData={filterAndSort(usersData)}></Profiles>
+            {loading ? (
+                <div className="loader">
+                    <InfinitySpin
+
+                        visible={true}
+                        width="200"
+                        color="#fbfbfe"
+                        ariaLabel="infinity-spin-loading"
+                    />
+                </div>
+            ) : (
+                <Profiles usersData={filterAndSort(usersData)}></Profiles>
+            )}
         </div>
     );
 };

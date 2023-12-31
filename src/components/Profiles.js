@@ -6,7 +6,7 @@ const Profiles = ({ usersData }) => {
             <table className="table table-transparent">
                 <thead>
                     <tr>
-                        <th scope="col">#</th>
+                        <th scope="col">Rank</th>
                         <th scope="col" className="hide-on-mobile">
                             Handle
                         </th>
@@ -33,13 +33,12 @@ const Item = (data) => (
             return (
                 <tr key={index}>
                     <th scope="row">{index + 1}</th>
-
                     <td className="hide-on-mobile">
                         <a href={`https://codeforces.com/profile/${value.handle}`}>{value.handle}</a>
                     </td>
-
-                    <td><a href={`https://codeforces.com/profile/${value.handle}`}>{value.name}</a></td>
-
+                    <td>
+                        <a href={`https://codeforces.com/profile/${value.handle}`}>{value.name}</a>
+                    </td>
                     <td className="hide-on-mobile">{value.regno}</td>
                     <td>{value.rating}</td>
                     <td>{value.maxRating}</td>
