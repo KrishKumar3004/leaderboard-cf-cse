@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import Profiles from './Profiles';
 import { InfinitySpin } from 'react-loader-spinner'
-
+import { app, db } from "../firebase";
+import { getAuth } from "firebase/auth";
+import { collection, getDocs, setDoc, doc } from "firebase/firestore";
 
 const Board = () => {
     const [usersData, setUsersData] = useState([]);
     const [sortingCriteria, setSortingCriteria] = useState('max-rating');
     const [selectedYear, setSelectedYear] = useState('ALL');
     const [loading, setLoading] = useState(true);
-
+    const auth = getAuth(app);
     useEffect(() => {
         const fetchInstituteData = async () => {
             try {
-                const apiUrl = 'https://pcon-leaderboard-backend.vercel.app/api/getCfHandles';
-                const response = await fetch(apiUrl);
+                const usersCollection = collection(db, "users");
+                const querySnapshot = await getDocs(usersCollection);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    return data;
-                } else {
-                    console.error('Failed to fetch data');
-                    return [];
-                }
+                const data = [];
+                querySnapshot.forEach((doc) => {
+                    const userData = doc.data();
+                    if (userData.emailVerified) {
+                        data.push(userData);
+                    }
+                });
+
+                return data;
             } catch (error) {
                 console.error('Error during API call:', error);
                 return [];
@@ -55,6 +59,20 @@ const Board = () => {
             }
         };
 
+        const updateUserEmailVerificationStatus = async () => {
+            try {
+                const user = auth.currentUser;
+                console.log(user);
+                if (user && user.emailVerified) {
+                    const userRef = doc(db, 'users', user.uid);
+                    await setDoc(userRef, { emailVerified: true }, { merge: true });
+                }
+            } catch (error) {
+                console.error('Error updating email verification status:', error);
+            }
+        };
+    
+        updateUserEmailVerificationStatus();
         fetchCodeforcesData();
     }, []);
 
