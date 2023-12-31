@@ -1,7 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { InfinitySpin } from 'react-loader-spinner';
-
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+    onAuthStateChanged,
+} from "firebase/auth";
+import { app, db} from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
+import { toast } from 'react-toastify';
 const Register = () => {
+    const auth = getAuth(app);
     const [formData, setFormData] = useState({
         cf_handle: '',
         name: '',
@@ -13,47 +22,53 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [validationResult, setValidationResult] = useState(null);
 
+    useEffect(() => {
+        const updateUserEmailVerificationStatus = async () => {
+            try {
+                const user = auth.currentUser;
+                if (user && user.emailVerified) {
+                    const userRef = doc(db, 'users', user.uid);
+                    await setDoc(userRef, { emailVerified: true }, { merge: true });
+                }
+            } catch (error) {
+                console.error('Error updating email verification status:', error);
+            }
+        };
+
+        updateUserEmailVerificationStatus();
+    }, []);
+
     const onRegister = async (formData) => {
         try {
             setLoading(true);
-
+            
             const email = `${formData.regno.toLowerCase()}@nitjsr.ac.in`;
             const batch = formData.regno.substring(0, 4);
-
+            
             formData = {
                 ...formData,
                 email,
                 batch,
             };
-
-            const apiUrl = 'https://pcon-leaderboard-backend.vercel.app/api/registerCfHandle';
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+            // firebase registration--
+            const userCredential = await createUserWithEmailAndPassword(auth, email, formData.regno);
+            const user = userCredential.user;
+            const docRef = doc(db, "users", user.uid);
+            await setDoc(docRef, {
+                cf_handle: formData.cf_handle,
+                name: formData.name,
+                batch: formData.batch,
+                regno: formData.regno,
+                email: formData.email,
+                uid: user.uid,
+                emailVerified: user.emailVerified,
             });
+            sendEmailVerification(auth.currentUser);
+            toast.success('Registration successful. Please verify your email.');
+            setValidationResult('Registration successful. Please verify your email.');
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log('API response:', data);
-                setValidationResult('Registration successful');
-
-                setFormData({
-                    cf_handle: '',
-                    name: '',
-                    batch: '',
-                    regno: '',
-                    email: '',
-                });
-            } else {
-                const errorData = await response.json();
-                console.error('API error:', errorData);
-                setValidationResult('Registration failed.');
-            }
         } catch (error) {
-            console.error('Error during API call:', error);
+            console.error('Some error occurerred :', error);
             setValidationResult('Registration failed.');
         } finally {
             setLoading(false);
@@ -189,7 +204,8 @@ const Register = () => {
                                             Register
                                         </button>
                                     </div>
-                                </form>
+                                </form> 
+
                             </div>
                         </div>
                     </div>
