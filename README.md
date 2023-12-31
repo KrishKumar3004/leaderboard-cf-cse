@@ -4,7 +4,7 @@ This is a dynamic leaderboard application for Computer Science and Engineering (
 
 ## Live Demo
 
-[https://leaderboard-cf-cse.vercel.app/register]
+https://leaderboard-cf-cse.vercel.app/register
 
 ## Features
 
@@ -54,7 +54,7 @@ yarn start
 ```
 
 
-2. Open your web browser and visit `http://localhost:3000` to access the game.
+2. Open your web browser and visit `http://localhost:3000` to access the app.
 
 ## Built With
 
@@ -63,4 +63,5 @@ yarn start
 ## Authors
 
 - [Krish Kumar](https://github.com/your-KrishKumar3004)
+- [Shivansh Kumar Dubey](https://github.com/shivanshdubey-232)
 - [Mohit Kumar Agrawal](https://github.com/mohitkumaragrawal)
