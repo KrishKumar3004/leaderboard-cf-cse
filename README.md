@@ -4,7 +4,7 @@ This is a dynamic leaderboard application for Computer Science and Engineering (
 
 ## Live Demo
 
-https://leaderboard-cf-cse.vercel.app/register
+https://leaderboard-cf-cse.vercel.app
 
 ## Features
 
