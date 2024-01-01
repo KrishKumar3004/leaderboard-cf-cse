@@ -3,7 +3,7 @@ import Profiles from './Profiles';
 import { InfinitySpin } from 'react-loader-spinner'
 import { app, db } from "../firebase";
 import { getAuth } from "firebase/auth";
-import { collection, getDocs, setDoc, doc } from "firebase/firestore";
+import { ref, query, orderByChild, equalTo, get, update } from "firebase/database"
 
 const Board = () => {
     const [usersData, setUsersData] = useState([]);
@@ -14,15 +14,16 @@ const Board = () => {
     useEffect(() => {
         const fetchInstituteData = async () => {
             try {
-                const usersCollection = collection(db, "users");
-                const querySnapshot = await getDocs(usersCollection);
-
+                const usersRef = ref(db, 'users');
+                const queryRef = query(usersRef);
+                
+                const querySnapshot = await get(queryRef);
+                
                 const data = [];
-                querySnapshot.forEach((doc) => {
-                    const userData = doc.data();
-                    if (userData.emailVerified) {
-                        data.push(userData);
-                    }
+                querySnapshot.forEach((childSnapshot) => {
+                    const userData = childSnapshot.val();
+                    console.log(userData);
+                    data.push(userData);
                 });
 
                 return data;
@@ -62,10 +63,11 @@ const Board = () => {
         const updateUserEmailVerificationStatus = async () => {
             try {
                 const user = auth.currentUser;
-                console.log(user);
                 if (user && user.emailVerified) {
-                    const userRef = doc(db, 'users', user.uid);
-                    await setDoc(userRef, { emailVerified: true }, { merge: true });
+                    const userRef = ref(db, `users/${user.uid}`);
+                    await update(userRef, {
+                        emailVerified: true,
+                    });
                 }
             } catch (error) {
                 console.error('Error updating email verification status:', error);

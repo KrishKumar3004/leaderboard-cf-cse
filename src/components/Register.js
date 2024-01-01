@@ -4,10 +4,9 @@ import {
     getAuth,
     createUserWithEmailAndPassword,
     sendEmailVerification,
-    onAuthStateChanged,
 } from "firebase/auth";
 import { app, db} from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
+import { ref, set, update } from "firebase/database";
 import { toast } from 'react-toastify';
 const Register = () => {
     const auth = getAuth(app);
@@ -27,8 +26,10 @@ const Register = () => {
             try {
                 const user = auth.currentUser;
                 if (user && user.emailVerified) {
-                    const userRef = doc(db, 'users', user.uid);
-                    await setDoc(userRef, { emailVerified: true }, { merge: true });
+                    const userRef = ref(db, `users/${user.uid}`);
+                    await update(userRef, {
+                        emailVerified: true,
+                    });                    
                 }
             } catch (error) {
                 console.error('Error updating email verification status:', error);
@@ -53,15 +54,15 @@ const Register = () => {
             // firebase registration--
             const userCredential = await createUserWithEmailAndPassword(auth, email, formData.regno);
             const user = userCredential.user;
-            const docRef = doc(db, "users", user.uid);
-            await setDoc(docRef, {
+            const userRef = ref(db, `users/${user.uid}`);
+            await set(userRef, {
                 cf_handle: formData.cf_handle,
                 name: formData.name,
                 batch: formData.batch,
                 regno: formData.regno,
                 email: formData.email,
                 uid: user.uid,
-                emailVerified: user.emailVerified,
+                emailVerified: false,
             });
             sendEmailVerification(auth.currentUser);
             toast.success('Registration successful. Please verify your email.');
