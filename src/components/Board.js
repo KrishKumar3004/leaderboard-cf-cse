@@ -22,7 +22,6 @@ const Board = () => {
                 const data = [];
                 querySnapshot.forEach((childSnapshot) => {
                     const userData = childSnapshot.val();
-                    console.log(userData);
                     data.push(userData);
                 });
 
