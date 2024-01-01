@@ -5,8 +5,8 @@ import {
     createUserWithEmailAndPassword,
     sendEmailVerification,
 } from "firebase/auth";
-import { app, db} from "../firebase";
-import { ref, set, update } from "firebase/database";
+import { app, db } from "../firebase";
+import { ref, set, update, get } from "firebase/database";
 import { toast } from 'react-toastify';
 const Register = () => {
     const auth = getAuth(app);
@@ -29,7 +29,7 @@ const Register = () => {
                     const userRef = ref(db, `users/${user.uid}`);
                     await update(userRef, {
                         emailVerified: true,
-                    });                    
+                    });
                 }
             } catch (error) {
                 console.error('Error updating email verification status:', error);
@@ -42,15 +42,32 @@ const Register = () => {
     const onRegister = async (formData) => {
         try {
             setLoading(true);
-            
+
             const email = `${formData.regno.toLowerCase()}@nitjsr.ac.in`;
             const batch = formData.regno.substring(0, 4);
-            
+
             formData = {
                 ...formData,
                 email,
                 batch,
             };
+
+            const existingUserRef = ref(db, 'users');
+            const existingUserSnapshot = await get(existingUserRef);
+
+            const existingUser = Object.values(existingUserSnapshot.val() || {}).find(
+                (user) => user.email === formData.email && !user.emailVerified
+            );
+
+            if (existingUser) {
+                // If email exists and is not verified, send email verification again
+                const userRef = ref(db, `users/${existingUser.uid}`);
+                await sendEmailVerification(auth.currentUser);
+                toast.success('Email verification link sent again. Please verify your email.');
+                setValidationResult('Email verification link sent again. Please verify your email.');
+                return;
+            }
+
             // firebase registration--
             const userCredential = await createUserWithEmailAndPassword(auth, email, formData.regno);
             const user = userCredential.user;
@@ -205,7 +222,7 @@ const Register = () => {
                                             Register
                                         </button>
                                     </div>
-                                </form> 
+                                </form>
 
                             </div>
                         </div>
