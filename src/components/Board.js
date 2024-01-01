@@ -44,20 +44,11 @@ const Board = () => {
 
                 if (data.status === 'OK') {
                     const mergedData = data.result.map(entry => {
-                        const matchingResEntry = res.find(resEntry => resEntry.cf_handle.toLowerCase() === entry.handle.toLowerCase());
+                        const matchingResEntry = res.find(resEntry => resEntry.cf_handle === entry.handle);
                         if (matchingResEntry) {
-                            return {
-                                ...entry,
-                                ...matchingResEntry,
-                                rating: entry.rating || 0,
-                                maxRating: entry.maxRating || 0
-                            };
+                            return { ...entry, ...matchingResEntry };
                         }
-                        return {
-                            ...entry,
-                            rating: entry.rating || 0,
-                            maxRating: entry.maxRating || 0
-                        };
+                        return entry;
                     });
                     setUsersData(mergedData);
                 } else {
