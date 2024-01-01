@@ -22,7 +22,9 @@ const Board = () => {
                 const data = [];
                 querySnapshot.forEach((childSnapshot) => {
                     const userData = childSnapshot.val();
-                    data.push(userData);
+                    if(userData.emailVerified){
+                        data.push(userData);
+                    }
                 });
 
                 return data;
