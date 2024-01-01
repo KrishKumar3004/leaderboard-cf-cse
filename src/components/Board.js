@@ -49,7 +49,11 @@ const Board = () => {
                             return { ...entry, ...matchingResEntry };
                         }
                         return entry;
-                    });
+                    }).map(entry => ({
+                        ...entry,
+                        maxRating: entry.maxRating || "0",
+                        rating: entry.rating || "0",
+                    }));
                     setUsersData(mergedData);
                 } else {
                     console.error('Error fetching user data:', data.comment || 'Unknown error');
