@@ -6,8 +6,8 @@ import {
     sendEmailVerification,
 } from "firebase/auth";
 import { app, db } from "../firebase";
-import { ref, set, update, get } from "firebase/database";
-import { toast } from 'react-toastify';
+import { ref, set, update } from "firebase/database";
+
 const Register = () => {
     const auth = getAuth(app);
     const [formData, setFormData] = useState({
@@ -20,11 +20,13 @@ const Register = () => {
 
     const [loading, setLoading] = useState(false);
     const [validationResult, setValidationResult] = useState(null);
+    const [verificationCooldown, setVerificationCooldown] = useState(false);
 
     useEffect(() => {
         const updateUserEmailVerificationStatus = async () => {
             try {
                 const user = auth.currentUser;
+                console.log(user);
                 if (user && user.emailVerified) {
                     const userRef = ref(db, `users/${user.uid}`);
                     await update(userRef, {
@@ -39,6 +41,7 @@ const Register = () => {
         updateUserEmailVerificationStatus();
     }, []);
 
+
     const onRegister = async (formData) => {
         try {
             setLoading(true);
@@ -52,18 +55,12 @@ const Register = () => {
                 batch,
             };
 
-            const existingUserRef = ref(db, 'users');
-            const existingUserSnapshot = await get(existingUserRef);
-
-            const existingUser = Object.values(existingUserSnapshot.val() || {}).find(
-                (user) => user.email === formData.email && !user.emailVerified
-            );
-
-            if (existingUser) {
+            const existingUser = auth.currentUser;
+            if (existingUser && !existingUser.emailVerified) {
                 // If email exists and is not verified, send email verification again
                 const userRef = ref(db, `users/${existingUser.uid}`);
+                console.log("this is an existing user!")
                 await sendEmailVerification(auth.currentUser);
-                toast.success('Email verification link sent again. Please verify your email.');
                 setValidationResult('Email verification link sent again. Please verify your email.');
                 return;
             }
@@ -82,7 +79,6 @@ const Register = () => {
                 emailVerified: false,
             });
             sendEmailVerification(auth.currentUser);
-            toast.success('Registration successful. Please verify your email.');
             setValidationResult('Registration successful. Please verify your email.');
 
         } catch (error) {
@@ -131,6 +127,25 @@ const Register = () => {
         onRegister(formData);
     };
 
+    const sendVerificationEmail = async () => {
+        try {
+            if (verificationCooldown) {
+                setValidationResult('Verification email already sent. Please wait.');
+                return;
+            }
+
+            setVerificationCooldown(true);
+            setValidationResult('Email verification link sent. Please check your email.');
+            await sendEmailVerification(auth.currentUser);
+        } catch (error) {
+            console.error('Error sending verification email:', error);
+
+        } finally {
+            setTimeout(() => {
+                setVerificationCooldown(false);
+            }, 60000); 
+        }
+    };
     return (
         <div className="container my-auto">
             {loading && (
@@ -216,11 +231,18 @@ const Register = () => {
                                     <div className="align-items-center d-flex">
                                         <button
                                             type="button"
-                                            className="btn btn-light ms-auto"
+                                            className="btn btn-light mx-auto"
                                             onClick={handleRegister}
                                         >
                                             Register
                                         </button>
+                                    </div>
+                                    <div className="align-items-center d-flex">
+                                    {auth.currentUser && !auth.currentUser.emailVerified && (
+                                        <button type="button" className="btn btn-light mx-auto mt-1" onClick= {sendVerificationEmail}>
+                                            Resend Verification Email
+                                        </button>
+                                    )}
                                     </div>
                                 </form>
 
