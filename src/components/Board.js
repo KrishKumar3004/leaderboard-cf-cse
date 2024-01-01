@@ -16,13 +16,13 @@ const Board = () => {
             try {
                 const usersRef = ref(db, 'users');
                 const queryRef = query(usersRef);
-                
+
                 const querySnapshot = await get(queryRef);
-                
+
                 const data = [];
                 querySnapshot.forEach((childSnapshot) => {
                     const userData = childSnapshot.val();
-                    if(userData.emailVerified){
+                    if (userData.emailVerified) {
                         data.push(userData);
                     }
                 });
@@ -44,11 +44,20 @@ const Board = () => {
 
                 if (data.status === 'OK') {
                     const mergedData = data.result.map(entry => {
-                        const matchingResEntry = res.find(resEntry => resEntry.cf_handle === entry.handle);
+                        const matchingResEntry = res.find(resEntry => resEntry.cf_handle.toLowerCase() === entry.handle.toLowerCase());
                         if (matchingResEntry) {
-                            return { ...entry, ...matchingResEntry };
+                            return {
+                                ...entry,
+                                ...matchingResEntry,
+                                rating: entry.rating || 0,
+                                maxRating: entry.maxRating || 0
+                            };
                         }
-                        return entry;
+                        return {
+                            ...entry,
+                            rating: entry.rating || 0,
+                            maxRating: entry.maxRating || 0
+                        };
                     });
                     setUsersData(mergedData);
                 } else {
@@ -74,7 +83,7 @@ const Board = () => {
                 console.error('Error updating email verification status:', error);
             }
         };
-    
+
         updateUserEmailVerificationStatus();
         fetchCodeforcesData();
     }, []);
